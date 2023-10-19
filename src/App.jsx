@@ -19,14 +19,14 @@ function App() {
 
     // const optionsLabel = searchParams.get('options');
     return (
-        <div className="m-6 text-gray-700 text-sm">
+        <div className="m-6 text-gray-700">
             <div className="flex items-center justify-end">
                 <Button>
-                    <BsArrowCounterclockwise className="text-2xl mr-2" />
+                    <BsArrowCounterclockwise className="text-xl mr-2" />
                     Votes
                 </Button>
                 <Button>
-                    <BsArrowCounterclockwise className="text-2xl mr-2" />
+                    <BsArrowCounterclockwise className="text-xl mr-2" />
                     Options
                 </Button>
             </div>

@@ -31,7 +31,7 @@ function OptionList() {
 
             <Button onClick={() => handleAddOption('')} className="w-full">
                 <BsPlusLg className="text mr-4" />
-                <span className="mt-[-2.3px]">Add Option</span>
+                Add Option
             </Button>
         </>
     );
