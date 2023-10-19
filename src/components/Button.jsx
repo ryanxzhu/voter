@@ -1,5 +1,9 @@
-function Button({ children }) {
-    return <button className="flex items-center px-6 py-4">{children}</button>;
+function Button({ children, onClick, className }) {
+    return (
+        <button className={`flex items-center px-4 py-3 ${className}`} onClick={onClick}>
+            {children}
+        </button>
+    );
 }
 
 export default Button;
