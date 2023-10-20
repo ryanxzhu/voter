@@ -38,9 +38,16 @@ function App() {
             }
         };
 
+        const handler2 = (e) => {
+            dispatch(addOption(newOption));
+        };
+
         document.addEventListener('keydown', handler);
-        dispatch(addOption(newOption));
-        return () => document.removeEventListener('keydown', handler);
+        document.addEventListener('onload', handler2);
+        return () => {
+            document.removeEventListener('keydown', handler);
+            document.removeEventListener('onload', handler2);
+        };
     }, []);
 
     const handleAddOption = () => {
@@ -78,7 +85,7 @@ function App() {
     const addOptionBtn = (
         <Button onClick={() => handleAddOption('')} className="w-full">
             <BsPlusLg className="mr-4" />
-            Add Option
+            Add Option1
         </Button>
     );
 
