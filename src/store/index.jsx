@@ -8,22 +8,54 @@ const optionsSlice = createSlice({
             state.push(action.payload);
         },
         removeOption(state, action) {
-            //
+            const index = state.map((e) => e.id).indexOf(action.payload);
+            state.splice(index, 1);
         },
         editLabel(state, action) {
-            //
+            const index = state.map((e) => e.id).indexOf(action.payload.id);
+            state[index].label = action.payload.value;
         },
-        updateVote(state, action) {
-            //
+        upvoteAction(state, action) {
+            const index = state.map((e) => e.id).indexOf(action.payload);
+            if (!state[index].upvote) {
+                for (let i = 0; i < state.length; i++) {
+                    state[i].upvote = false;
+                }
+            }
+            state[index].upvote = !state[index].upvote;
+        },
+        downvoteAction(state, action) {
+            const index = state.map((e) => e.id).indexOf(action.payload);
+            if (!state[index].downvote) {
+                for (let i = 0; i < state.length; i++) {
+                    state[i].downvote = false;
+                }
+            }
+            state[index].downvote = !state[index].downvote;
         },
         tallyVotes(state, action) {
-            //
+            for (let i = 0; i < state.length; i++) {
+                if (state[i].label === '') {
+                    state.splice(i, 1);
+                    i--;
+                    continue;
+                }
+                if (state[i].upvote) state[i].score++;
+                if (state[i].downvote) state[i].score--;
+                state[i].upvote = false;
+                state[i].downvote = false;
+            }
         },
-        nextPerson(state, action) {
-            //
+        resetVotes(state, action) {
+            for (let i = 0; i < state.length; i++) {
+                state[i].score = 0;
+                state[i].upvote = false;
+                state[i].downvote = false;
+            }
         },
-        showResults(state, action) {
-            //
+
+        resetOptions(state, action) {
+            state.length = 0;
         },
     },
 });
@@ -66,8 +98,15 @@ const action = optionsSlice.actions.addOption({
 
 store.dispatch(action);
 
-console.log(store.getState());
-
 export { store };
 
-export const { addOption } = optionsSlice.actions;
+export const {
+    addOption,
+    removeOption,
+    editLabel,
+    upvoteAction,
+    downvoteAction,
+    tallyVotes,
+    resetVotes,
+    resetOptions,
+} = optionsSlice.actions;

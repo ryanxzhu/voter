@@ -1,10 +1,68 @@
 import './App.css';
+import { v4 as uuidv4 } from 'uuid';
 import { useSearchParams } from 'react-router-dom';
-import OptionList from './components/OptionList';
+import Option from './components/Option';
 import Button from './components/Button';
+import { BsPlusLg } from 'react-icons/bs';
 import { SlRefresh } from 'react-icons/sl';
+import { useState } from 'react';
+import { addOption, tallyVotes, resetVotes, resetOptions } from './store';
+import { useDispatch, useSelector } from 'react-redux';
 
 function App() {
+    const [editable, setEditable] = useState(true);
+    const [count, setCount] = useState(0);
+    const dispatch = useDispatch();
+    const optionList = useSelector((state) => {
+        return state.options;
+    });
+
+    const handleAddOption = (label) => {
+        const newOption = {
+            id: uuidv4(),
+            label: label,
+            score: 0,
+            upvote: false,
+            downvote: false,
+        };
+        dispatch(addOption(newOption));
+    };
+
+    const handleTallyVotes = () => {
+        dispatch(tallyVotes());
+    };
+
+    const handleResetVotes = () => {
+        dispatch(resetVotes());
+        setCount(0);
+        setEditable(true);
+    };
+
+    const handleResetOptions = () => {
+        dispatch(resetOptions());
+        setCount(0);
+        setEditable(true);
+    };
+
+    const renderedOptions = optionList.map((option) => {
+        return <Option key={option.id} option={option} editable={editable} />;
+    });
+
+    const renderedVotes = (
+        <div className="flex items-center">
+            <div className="w-12 h-12 flex items-center justify-center">{count}</div>
+            Vote
+            {count === 1 ? '' : 's'}
+        </div>
+    );
+
+    const addOptionBtn = (
+        <Button onClick={() => handleAddOption('')} className="w-full">
+            <BsPlusLg className="mr-4" />
+            Add Option
+        </Button>
+    );
+
     // const [searchParams, setSearchParams] = useSearchParams({ options: '' });
     // const onChange = (e) =>
     //     setSearchParams(
@@ -15,22 +73,49 @@ function App() {
     //         { replace: true }
     //     );
 
-    const onChange = (e) => setOptions(e.target.value);
-
     // const optionsLabel = searchParams.get('options');
+
     return (
         <div className="m-2 text-gray-700">
             <div className="flex items-center justify-end">
-                <Button>
+                <Button onClick={() => handleResetVotes()}>
                     <SlRefresh className="text-xl mr-2" />
                     Votes
                 </Button>
-                <Button>
+                <Button
+                    onClick={() => {
+                        const result = confirm('Are you sure you want to reset all vote options?');
+                        result && handleResetOptions();
+                    }}
+                >
                     <SlRefresh className="text-xl mr-2" />
                     Options
                 </Button>
             </div>
-            <OptionList />
+
+            {renderedOptions}
+
+            {editable ? addOptionBtn : renderedVotes}
+
+            <Button
+                onClick={() => {
+                    handleTallyVotes();
+                    setEditable(false);
+                    setCount(count + 1);
+                }}
+                className="justify-center border rounded-lg mx-auto w-24"
+            >
+                Vote
+            </Button>
+
+            <Button
+                onClick={() => {
+                    handleTallyVotes();
+                }}
+                className="justify-center border rounded-lg mx-auto w-24 mt-6"
+            >
+                Results
+            </Button>
         </div>
     );
 }
