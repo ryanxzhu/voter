@@ -5,7 +5,7 @@ import Option from './components/Option';
 import Button from './components/Button';
 import { BsPlusLg } from 'react-icons/bs';
 import { SlRefresh } from 'react-icons/sl';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { addOption, tallyVotes, resetVotes, resetOptions } from './store';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -16,6 +16,26 @@ function App() {
     const optionList = useSelector((state) => {
         return state.options;
     });
+
+    useEffect(() => {
+        const handler = (e) => {
+            console.log(e.key);
+            if (e.key === 'Enter') {
+                const newOption = {
+                    id: uuidv4(),
+                    label: '',
+                    score: 0,
+                    upvote: false,
+                    downvote: false,
+                };
+                dispatch(addOption(newOption));
+            }
+        };
+
+        document.addEventListener('keydown', handler);
+
+        return () => document.removeEventListener('keydown', handler);
+    }, []);
 
     const handleAddOption = (label) => {
         const newOption = {
