@@ -18,7 +18,7 @@ function App() {
     useEffect(() => {
         const urlOptions = searchParams.get('options');
         if (urlOptions !== '') {
-            const initOptions = urlOptions.split('#').map((label) => {
+            const initOptions = urlOptions.split('·').map((label) => {
                 return {
                     id: uuidv4(),
                     label,
@@ -48,6 +48,19 @@ function App() {
         };
     }, []);
 
+    const optionList = useSelector((state) => {
+        return state.options;
+    });
+
+    const urlOptions = optionList.map((option) => option.label).join('·');
+
+    useEffect(() => {
+        setSearchParams((data) => {
+            data.set('options', urlOptions);
+            return data;
+        });
+    }, [urlOptions]);
+
     const handleAddOption = () => {
         const newOption = {
             id: uuidv4(),
@@ -74,12 +87,6 @@ function App() {
         setVoteCount(0);
         setEditable(true);
     };
-
-    const optionList = useSelector((state) => {
-        return state.options;
-    });
-
-    const urlOptions = optionList.map((option) => option.label).join('#');
 
     const voteBtnVisible = optionList.length > 1;
     const resultsBtnVisible = voteCount > 1;
@@ -143,11 +150,6 @@ function App() {
                         handleTallyVotes();
                         setEditable(false);
                         setVoteCount(voteCount + 1);
-                        setSearchParams((data) => {
-                            console.log('here1');
-                            data.set('options', urlOptions);
-                            return data;
-                        });
                     }}
                     className="justify-center border border-slate-700 bg-slate-700 text-white rounded-lg mx-auto w-24 mt-4"
                 >
