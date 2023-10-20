@@ -2,15 +2,7 @@ import { configureStore, createSlice } from '@reduxjs/toolkit';
 
 const optionsSlice = createSlice({
     name: 'option',
-    initialState: [
-        {
-            id: 'de6d8eeb-c55b-43ff-a23a-3cf7191ff83e',
-            label: '',
-            score: 0,
-            upvote: false,
-            downvote: false,
-        },
-    ],
+    initialState: [],
     reducers: {
         addOption(state, action) {
             state.push(action.payload);

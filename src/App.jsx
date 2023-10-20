@@ -10,6 +10,13 @@ import { addOption, tallyVotes, resetVotes, resetOptions } from './store';
 import { useDispatch, useSelector } from 'react-redux';
 
 function App() {
+    const newOption = {
+        id: uuidv4(),
+        label: '',
+        score: 0,
+        upvote: false,
+        downvote: false,
+    };
     const [editable, setEditable] = useState(true);
     const [count, setCount] = useState(0);
     const dispatch = useDispatch();
@@ -18,32 +25,25 @@ function App() {
     });
 
     useEffect(() => {
+        const newOption = {
+            id: uuidv4(),
+            label: '',
+            score: 0,
+            upvote: false,
+            downvote: false,
+        };
         const handler = (e) => {
             if (e.key === 'Enter') {
-                const newOption = {
-                    id: uuidv4(),
-                    label: '',
-                    score: 0,
-                    upvote: false,
-                    downvote: false,
-                };
                 dispatch(addOption(newOption));
             }
         };
 
         document.addEventListener('keydown', handler);
-
+        dispatch(addOption(newOption));
         return () => document.removeEventListener('keydown', handler);
     }, []);
 
-    const handleAddOption = (label) => {
-        const newOption = {
-            id: uuidv4(),
-            label: label,
-            score: 0,
-            upvote: false,
-            downvote: false,
-        };
+    const handleAddOption = () => {
         dispatch(addOption(newOption));
     };
 
@@ -93,7 +93,6 @@ function App() {
     //     );
 
     // const optionsLabel = searchParams.get('options');
-
     return (
         <div className="m-2 text-gray-700">
             <div className="flex items-center justify-end">
