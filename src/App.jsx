@@ -19,7 +19,6 @@ function App() {
 
     useEffect(() => {
         const handler = (e) => {
-            console.log(e.key);
             if (e.key === 'Enter') {
                 const newOption = {
                     id: uuidv4(),
@@ -132,7 +131,7 @@ function App() {
                 onClick={() => {
                     handleTallyVotes();
                 }}
-                className="justify-center border rounded-lg mx-auto w-24 mt-6"
+                className="justify-center border rounded-lg mx-auto w-24 mt-10"
             >
                 Results
             </Button>
