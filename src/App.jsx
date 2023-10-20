@@ -6,17 +6,29 @@ import Button from './components/Button';
 import { BsPlusLg } from 'react-icons/bs';
 import { SlRefresh } from 'react-icons/sl';
 import { useState, useEffect } from 'react';
-import { addOption, tallyVotes, resetVotes, resetOptions } from './store';
+import { init, addOption, tallyVotes, resetVotes, resetOptions } from './store';
 import { useDispatch, useSelector } from 'react-redux';
 
 function App() {
+    const [searchParams, setSearchParams] = useSearchParams({ options: '' });
     const [editable, setEditable] = useState(true);
     const [voteCount, setVoteCount] = useState(0);
     const dispatch = useDispatch();
-    const optionList = useSelector((state) => {
-        return state.options;
-    });
+
     useEffect(() => {
+        const urlOptions = searchParams.get('options');
+        if (urlOptions !== '') {
+            const initOptions = urlOptions.split('#').map((label) => {
+                return {
+                    id: uuidv4(),
+                    label,
+                    score: 0,
+                    upvote: false,
+                    downvote: false,
+                };
+            });
+            dispatch(init(initOptions));
+        }
         const handler = (e) => {
             if (e.key === 'Enter') {
                 const newOption = {
@@ -63,6 +75,12 @@ function App() {
         setEditable(true);
     };
 
+    const optionList = useSelector((state) => {
+        return state.options;
+    });
+
+    const urlOptions = optionList.map((option) => option.label).join('#');
+
     const voteBtnVisible = optionList.length > 1;
     const resultsBtnVisible = voteCount > 1;
     const resetVotesVisible = voteCount > 0;
@@ -92,17 +110,6 @@ function App() {
         </Button>
     );
 
-    // const [searchParams, setSearchParams] = useSearchParams({ options: '' });
-    // const onChange = (e) =>
-    //     setSearchParams(
-    //         (prev) => {
-    //             prev.set('options', e.target.value);
-    //             return prev;
-    //         },
-    //         { replace: true }
-    //     );
-
-    // const optionsLabel = searchParams.get('options');
     return (
         <div className="relative m-2 text-gray-700">
             <div className="absolute right-0 flex items-center justify-end">
@@ -136,6 +143,11 @@ function App() {
                         handleTallyVotes();
                         setEditable(false);
                         setVoteCount(voteCount + 1);
+                        setSearchParams((data) => {
+                            console.log('here1');
+                            data.set('options', urlOptions);
+                            return data;
+                        });
                     }}
                     className="justify-center border border-slate-700 bg-slate-700 text-white rounded-lg mx-auto w-24 mt-4"
                 >

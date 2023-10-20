@@ -4,6 +4,9 @@ const optionsSlice = createSlice({
     name: 'option',
     initialState: [],
     reducers: {
+        init(state, action) {
+            return action.payload;
+        },
         addOption(state, action) {
             state.push(action.payload);
         },
@@ -77,4 +80,5 @@ export const {
     tallyVotes,
     resetVotes,
     resetOptions,
+    init,
 } = optionsSlice.actions;
