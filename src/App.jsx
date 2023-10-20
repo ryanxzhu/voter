@@ -55,10 +55,13 @@ function App() {
     const urlOptions = optionList.map((option) => option.label).join('·');
 
     useEffect(() => {
-        setSearchParams((data) => {
-            data.set('options', urlOptions);
-            return data;
-        });
+        setSearchParams(
+            (data) => {
+                data.set('options', urlOptions);
+                return data;
+            },
+            { replace: true }
+        );
     }, [urlOptions]);
 
     const handleAddOption = () => {
