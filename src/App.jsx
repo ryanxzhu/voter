@@ -10,21 +10,33 @@ import { addOption, tallyVotes, resetVotes, resetOptions } from './store';
 import { useDispatch, useSelector } from 'react-redux';
 
 function App() {
-    const newOption = {
-        id: uuidv4(),
-        label: '',
-        score: 0,
-        upvote: false,
-        downvote: false,
-    };
     const [editable, setEditable] = useState(true);
-    const [count, setCount] = useState(0);
+    const [voteCount, setVoteCount] = useState(0);
     const dispatch = useDispatch();
     const optionList = useSelector((state) => {
         return state.options;
     });
-
     useEffect(() => {
+        const handler = (e) => {
+            if (e.key === 'Enter') {
+                const newOption = {
+                    id: uuidv4(),
+                    label: '',
+                    score: 0,
+                    upvote: false,
+                    downvote: false,
+                };
+                dispatch(addOption(newOption));
+            }
+        };
+
+        document.addEventListener('keydown', handler);
+        return () => {
+            document.removeEventListener('keydown', handler);
+        };
+    }, []);
+
+    const handleAddOption = () => {
         const newOption = {
             id: uuidv4(),
             label: '',
@@ -32,25 +44,6 @@ function App() {
             upvote: false,
             downvote: false,
         };
-        const handler = (e) => {
-            if (e.key === 'Enter') {
-                dispatch(addOption(newOption));
-            }
-        };
-
-        const handler2 = (e) => {
-            dispatch(addOption(newOption));
-        };
-
-        document.addEventListener('keydown', handler);
-        document.addEventListener('onload', handler2);
-        return () => {
-            document.removeEventListener('keydown', handler);
-            document.removeEventListener('onload', handler2);
-        };
-    }, []);
-
-    const handleAddOption = () => {
         dispatch(addOption(newOption));
     };
 
@@ -60,15 +53,20 @@ function App() {
 
     const handleResetVotes = () => {
         dispatch(resetVotes());
-        setCount(0);
+        setVoteCount(0);
         setEditable(true);
     };
 
     const handleResetOptions = () => {
         dispatch(resetOptions());
-        setCount(0);
+        setVoteCount(0);
         setEditable(true);
     };
+
+    const voteBtnVisible = optionList.length > 1;
+    const resultsBtnVisible = voteCount > 1;
+    const resetVotesVisible = voteCount > 0;
+    const resetOptionsVisible = optionList.length > 2;
 
     const renderedOptions = optionList.map((option) => {
         return <Option key={option.id} option={option} editable={editable} />;
@@ -76,16 +74,21 @@ function App() {
 
     const renderedVotes = (
         <div className="flex items-center">
-            <div className="w-12 h-12 flex items-center justify-center">{count}</div>
+            <div className="w-12 h-12 flex items-center justify-center">{voteCount}</div>
             Vote
-            {count === 1 ? '' : 's'}
+            {voteCount === 1 ? '' : 's'}
         </div>
     );
 
     const addOptionBtn = (
-        <Button onClick={() => handleAddOption('')} className="w-full">
+        <Button
+            onClick={() => {
+                handleAddOption('');
+            }}
+            className="w-full"
+        >
             <BsPlusLg className="mr-4" />
-            Add Option1
+            Add Option
         </Button>
     );
 
@@ -101,46 +104,55 @@ function App() {
 
     // const optionsLabel = searchParams.get('options');
     return (
-        <div className="m-2 text-gray-700">
-            <div className="flex items-center justify-end">
-                <Button onClick={() => handleResetVotes()}>
-                    <SlRefresh className="text-xl mr-2" />
-                    Votes
-                </Button>
-                <Button
-                    onClick={() => {
-                        const result = confirm('Are you sure you want to reset all vote options?');
-                        result && handleResetOptions();
-                    }}
-                >
-                    <SlRefresh className="text-xl mr-2" />
-                    Options
-                </Button>
+        <div className="relative m-2 text-gray-700">
+            <div className="absolute right-0 flex items-center justify-end">
+                {resetVotesVisible && (
+                    <Button onClick={() => handleResetVotes()}>
+                        <SlRefresh className="text-xl mr-2" />
+                        Votes
+                    </Button>
+                )}
+                {resetOptionsVisible > 0 && (
+                    <Button
+                        onClick={() => {
+                            const result = confirm(
+                                'Are you sure you want to reset all vote options?'
+                            );
+                            result && handleResetOptions();
+                        }}
+                    >
+                        <SlRefresh className="text-xl mr-2" />
+                        Options
+                    </Button>
+                )}
             </div>
-
-            {renderedOptions}
+            <div className="pt-12">{renderedOptions}</div>
 
             {editable ? addOptionBtn : renderedVotes}
 
-            <Button
-                onClick={() => {
-                    handleTallyVotes();
-                    setEditable(false);
-                    setCount(count + 1);
-                }}
-                className="justify-center border rounded-lg mx-auto w-24"
-            >
-                Vote
-            </Button>
+            {voteBtnVisible && (
+                <Button
+                    onClick={() => {
+                        handleTallyVotes();
+                        setEditable(false);
+                        setVoteCount(voteCount + 1);
+                    }}
+                    className="justify-center border border-slate-700 bg-slate-700 text-white rounded-lg mx-auto w-24 mt-4"
+                >
+                    Vote
+                </Button>
+            )}
 
-            <Button
-                onClick={() => {
-                    handleTallyVotes();
-                }}
-                className="justify-center border rounded-lg mx-auto w-24 mt-10"
-            >
-                Results
-            </Button>
+            {resultsBtnVisible && (
+                <Button
+                    onClick={() => {
+                        handleTallyVotes();
+                    }}
+                    className="justify-center border border-slate-700 rounded-lg mx-auto w-24 mt-8"
+                >
+                    Results
+                </Button>
+            )}
         </div>
     );
 }

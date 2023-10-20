@@ -55,7 +55,7 @@ const optionsSlice = createSlice({
         },
 
         resetOptions(state, action) {
-            state.length = 0;
+            return [];
         },
     },
 });
