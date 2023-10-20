@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 function App() {
     const [searchParams, setSearchParams] = useSearchParams({ options: '' });
     const [editable, setEditable] = useState(true);
+    const [showResults, setShowResults] = useState(false);
     const [voteCount, setVoteCount] = useState(0);
     const dispatch = useDispatch();
 
@@ -48,9 +49,11 @@ function App() {
         };
     }, []);
 
-    const optionList = useSelector((state) => {
-        return state.options;
-    });
+    const optionList = Array.from(
+        useSelector((state) => {
+            return state.options;
+        })
+    );
 
     const urlOptions = optionList.map((option) => option.label).join('·');
 
@@ -75,20 +78,28 @@ function App() {
         dispatch(addOption(newOption));
     };
 
-    const handleTallyVotes = () => {
+    const handleVote = () => {
         dispatch(tallyVotes());
+        setEditable(false);
+        setVoteCount(voteCount + 1);
     };
 
     const handleResetVotes = () => {
         dispatch(resetVotes());
         setVoteCount(0);
         setEditable(true);
+        setShowResults(false);
     };
 
     const handleResetOptions = () => {
         dispatch(resetOptions());
         setVoteCount(0);
         setEditable(true);
+        setShowResults(false);
+    };
+
+    const handleResults = () => {
+        setShowResults(true);
     };
 
     const voteBtnVisible = optionList.length > 1;
@@ -96,8 +107,22 @@ function App() {
     const resetVotesVisible = voteCount > 0;
     const resetOptionsVisible = optionList.length > 2;
 
+    let maxScore;
+    if (showResults) {
+        optionList.sort((a, b) => b.score - a.score);
+        maxScore = Math.max(...optionList.map((option) => option.score));
+    }
+
     const renderedOptions = optionList.map((option) => {
-        return <Option key={option.id} option={option} editable={editable} />;
+        return (
+            <Option
+                key={option.id}
+                option={option}
+                editable={editable}
+                showResults={showResults}
+                maxScore={maxScore}
+            />
+        );
     });
 
     const renderedVotes = (
@@ -149,11 +174,7 @@ function App() {
 
             {voteBtnVisible && (
                 <Button
-                    onClick={() => {
-                        handleTallyVotes();
-                        setEditable(false);
-                        setVoteCount(voteCount + 1);
-                    }}
+                    onClick={() => handleVote()}
                     className="justify-center border border-slate-700 bg-slate-700 text-white rounded-lg mx-auto w-24 mt-4"
                 >
                     Vote
@@ -162,9 +183,7 @@ function App() {
 
             {resultsBtnVisible && (
                 <Button
-                    onClick={() => {
-                        handleTallyVotes();
-                    }}
+                    onClick={() => handleResults()}
                     className="justify-center border border-slate-700 rounded-lg mx-auto w-24 mt-8"
                 >
                     Results
