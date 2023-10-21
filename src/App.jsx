@@ -127,7 +127,7 @@ function App() {
             onClick={() => {
                 handleAddOption('');
             }}
-            className="w-full"
+            className="w-2/3"
         >
             <BsPlusLg className="mr-4" />
             Add Option
