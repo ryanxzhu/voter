@@ -24,6 +24,7 @@ const optionsSlice = createSlice({
                 for (let i = 0; i < state.length; i++) {
                     state[i].upvote = false;
                 }
+                state[index].downvote = false;
             }
             state[index].upvote = !state[index].upvote;
         },
@@ -33,6 +34,7 @@ const optionsSlice = createSlice({
                 for (let i = 0; i < state.length; i++) {
                     state[i].downvote = false;
                 }
+                state[index].upvote = false;
             }
             state[index].downvote = !state[index].downvote;
         },
