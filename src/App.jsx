@@ -9,6 +9,16 @@ import { useState, useEffect } from 'react';
 import { init, addOption, tallyVotes, resetVotes, resetOptions } from './store';
 import { useDispatch, useSelector } from 'react-redux';
 
+function newOption(label = '') {
+    return {
+        id: uuidv4(),
+        label: label,
+        score: 0,
+        upvote: false,
+        downvote: false,
+    };
+}
+
 function App() {
     const [searchParams, setSearchParams] = useSearchParams({ options: '' });
     const [editable, setEditable] = useState(true);
@@ -19,31 +29,17 @@ function App() {
     useEffect(() => {
         const urlOptions = searchParams.get('options');
         if (urlOptions !== '') {
-            const initOptions = urlOptions.split('·').map((label) => {
-                return {
-                    id: uuidv4(),
-                    label,
-                    score: 0,
-                    upvote: false,
-                    downvote: false,
-                };
-            });
+            const initOptions = urlOptions.split('·').map((label) => newOption(label));
             dispatch(init(initOptions));
         }
+
         const handler = (e) => {
             if (e.key === 'Enter') {
-                const newOption = {
-                    id: uuidv4(),
-                    label: '',
-                    score: 0,
-                    upvote: false,
-                    downvote: false,
-                };
-                dispatch(addOption(newOption));
+                dispatch(addOption(newOption()));
             }
         };
-
         document.addEventListener('keydown', handler);
+
         return () => {
             document.removeEventListener('keydown', handler);
         };
@@ -68,14 +64,7 @@ function App() {
     }, [urlOptions]);
 
     const handleAddOption = () => {
-        const newOption = {
-            id: uuidv4(),
-            label: '',
-            score: 0,
-            upvote: false,
-            downvote: false,
-        };
-        dispatch(addOption(newOption));
+        dispatch(addOption(newOption()));
     };
 
     const handleVote = () => {
@@ -107,10 +96,10 @@ function App() {
     const resetVotesVisible = voteCount > 0;
     const resetOptionsVisible = optionList.length > 2;
 
-    let maxScore;
+    const maxScore = Math.max(...optionList.map((e) => e.score));
+
     if (showResults) {
         optionList.sort((a, b) => b.score - a.score);
-        maxScore = Math.max(...optionList.map((option) => option.score));
     }
 
     const renderedOptions = optionList.map((option) => {
@@ -146,7 +135,7 @@ function App() {
     );
 
     return (
-        <div className="relative m-2 text-gray-700">
+        <div className="relative m-2 text-gray-700 max-w-md md:mx-auto">
             <div className="absolute right-0 flex items-center justify-end">
                 {resetVotesVisible && (
                     <Button onClick={() => handleResetVotes()}>
@@ -176,6 +165,7 @@ function App() {
                 <Button
                     onClick={() => handleVote()}
                     className="justify-center border border-slate-700 bg-slate-700 text-white rounded-lg mx-auto w-24 mt-4"
+                    disabled={showResults}
                 >
                     Vote
                 </Button>

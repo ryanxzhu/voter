@@ -20,10 +20,6 @@ function Option({ option, editable, showResults, maxScore }) {
         dispatch(downvoteAction(id));
     };
 
-    let width = Math.round(100 * (option.score / maxScore));
-    width = width >= 0 ? width : 0;
-    console.log(width);
-
     const thumbs = (
         <div className="flex items-center">
             <Button onClick={() => handleUpVote(option.id)}>
@@ -39,11 +35,22 @@ function Option({ option, editable, showResults, maxScore }) {
         </div>
     );
 
+    const score = option.score > 0 ? option.score : 0;
+    let barWidth;
+    if (maxScore === 0) {
+        barWidth = 0;
+    } else {
+        barWidth = Math.round((100 * score) / maxScore);
+    }
+
     const bar = (
         <div className="flex items-center">
             <div className="mr-3">{option.score}</div>
-            <div className="w-[100px] h-10 flex justify-end">
-                <div className={`border h-6 my-2 bg-slate-700 rounded w-[${width}px]`}></div>
+            <div className="w-[100px] h-10 flex justify-end items-center">
+                <div
+                    id={option.id}
+                    className={`w-[${barWidth}%] h-5 rounded-lg bg-slate-700`}
+                ></div>
             </div>
         </div>
     );
