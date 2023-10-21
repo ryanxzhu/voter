@@ -175,6 +175,7 @@ function App() {
                 <Button
                     onClick={() => handleResults()}
                     className="justify-center border border-slate-700 rounded-lg mx-auto w-24 mt-8"
+                    disabled={showResults}
                 >
                     Results
                 </Button>

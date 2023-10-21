@@ -46,7 +46,7 @@ function Option({ option, editable, showResults, maxScore }) {
     const bar = (
         <div className="flex items-center">
             <div className="mr-3">{option.score}</div>
-            <div className="w-[100px] h-10 flex justify-end items-center">
+            <div className="w-[100px] h-10 flex items-center">
                 <div className={`w-[${barWidth}%] h-5 rounded-lg bg-slate-700`}></div>
             </div>
         </div>
