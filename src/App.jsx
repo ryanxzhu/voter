@@ -6,7 +6,7 @@ import Button from './components/Button';
 import { BsPlusLg } from 'react-icons/bs';
 import { SlRefresh } from 'react-icons/sl';
 import { useState, useEffect } from 'react';
-import { init, addOption, tallyVotes, resetVotes, resetOptions } from './store';
+import { init, addOption, tallyVotes, resetVotes, resetOptions, setShowResults } from './store';
 import { useDispatch, useSelector } from 'react-redux';
 
 function newOption(label = '') {
@@ -21,9 +21,6 @@ function newOption(label = '') {
 
 function App() {
     const [searchParams, setSearchParams] = useSearchParams({ options: '' });
-    const [editable, setEditable] = useState(true);
-    const [showResults, setShowResults] = useState(false);
-    const [voteCount, setVoteCount] = useState(0);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -51,6 +48,10 @@ function App() {
         })
     );
 
+    const votes = useSelector((state) => {
+        return state.votes;
+    });
+
     const urlOptions = optionList.map((option) => option.label).join('·');
 
     useEffect(() => {
@@ -69,36 +70,28 @@ function App() {
 
     const handleVote = () => {
         dispatch(tallyVotes());
-        setEditable(false);
-        setVoteCount(voteCount + 1);
     };
 
     const handleResetVotes = () => {
         dispatch(resetVotes());
-        setVoteCount(0);
-        setEditable(true);
-        setShowResults(false);
     };
 
     const handleResetOptions = () => {
         dispatch(resetOptions());
-        setVoteCount(0);
-        setEditable(true);
-        setShowResults(false);
     };
 
     const handleResults = () => {
-        setShowResults(true);
+        dispatch(setShowResults(true));
     };
 
     const voteBtnVisible = optionList.length > 1;
-    const resultsBtnVisible = voteCount > 1;
-    const resetVotesVisible = voteCount > 0;
+    const resultsBtnVisible = votes.voteCount > 1;
+    const resetVotesVisible = votes.voteCount > 0;
     const resetOptionsVisible = optionList.length > 2;
 
     const maxScore = Math.max(...optionList.map((e) => e.score));
 
-    if (showResults) {
+    if (votes.showResults) {
         optionList.sort((a, b) => b.score - a.score);
     }
 
@@ -107,8 +100,8 @@ function App() {
             <Option
                 key={option.id}
                 option={option}
-                editable={editable}
-                showResults={showResults}
+                editable={votes.editable}
+                showResults={votes.showResults}
                 maxScore={maxScore}
             />
         );
@@ -116,9 +109,9 @@ function App() {
 
     const renderedVotes = (
         <div className="flex items-center">
-            <div className="w-12 h-12 flex items-center justify-center">{voteCount}</div>
+            <div className="w-12 h-12 flex items-center justify-center">{votes.voteCount}</div>
             Vote
-            {voteCount === 1 ? '' : 's'}
+            {votes.voteCount === 1 ? '' : 's'}
         </div>
     );
 
@@ -159,13 +152,13 @@ function App() {
             </div>
             <div className="pt-12">{renderedOptions}</div>
 
-            {editable ? addOptionBtn : renderedVotes}
+            {votes.editable ? addOptionBtn : renderedVotes}
 
             {voteBtnVisible && (
                 <Button
                     onClick={() => handleVote()}
                     className="justify-center border border-slate-700 bg-slate-700 text-white rounded-lg mx-auto w-24 mt-4"
-                    disabled={showResults}
+                    disabled={votes.showResults}
                 >
                     Vote
                 </Button>
@@ -175,7 +168,7 @@ function App() {
                 <Button
                     onClick={() => handleResults()}
                     className="justify-center border border-slate-700 rounded-lg mx-auto w-24 mt-8"
-                    disabled={showResults}
+                    disabled={votes.showResults}
                 >
                     Results
                 </Button>

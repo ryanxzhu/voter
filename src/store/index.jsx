@@ -12,10 +12,12 @@ import {
     resetOptions,
     init,
 } from './slices/optionsSlice';
+import { votesReducer, setShowResults } from './slices/votesSlice';
 
 const store = configureStore({
     reducer: {
         options: optionsReducer,
+        votes: votesReducer,
     },
 });
 
@@ -30,4 +32,5 @@ export {
     resetVotes,
     resetOptions,
     init,
+    setShowResults,
 };
